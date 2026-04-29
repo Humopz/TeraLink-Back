@@ -1,38 +1,44 @@
-// rodar projeto -> npm run start:dev
-
-require('dotenv').config({path: `${process.cwd()}/.env`})
+/require('dotenv').config({ path: `${process.cwd()}/.env` });
 
 const express = require('express');
 const cors = require('cors');
 
 const authRouter = require('./route/authRoute');
-const { status } = require('express/lib/response');
 
 const app = express();
 
+// Middlewares
 app.use(express.json());
 
-app.use(cors());
+// CORS (liberado para seu front no Vercel)
+app.use(cors({
+    origin: "https://tera-link-front.vercel.app",
+    credentials: true
+}));
 
+// Rota de teste
 app.get('/', (req, res) => {
     res.status(200).json({
         status: 'success',
         message: 'servidor conectado.'
-    })
-})
+    });
+});
 
-// todas as rotas estarão aqui
+// Rotas principais
 app.use('/auth', authRouter);
 
-app.use('*', (req, res, next) => {
+// 404
+app.use('*', (req, res) => {
     res.status(404).json({
         status: 'fail',
         message: 'Route não encontrada'
-    })
-})
+    });
+});
 
-const PORT = process.env.APP_PORT || 4000;
+// Porta do Render (IMPORTANTE)
+const PORT = process.env.PORT || 4000;
 
-app.listen(process.env.APP_PORT, () => {
-    console.log('Servidor rodando', PORT)
-})
+// Start servidor
+app.listen(PORT, () => {
+    console.log('Servidor rodando na porta', PORT);
+});
